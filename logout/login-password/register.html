@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Регистрация</title>
+    <script src="https://kit.fontawesome.com/d39b623768.js" crossorigin="anonymous"></script>
+    <script src="/head/login-password/index.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel="stylesheet">
+    <link rel="icon" href="free.icon.ico">
+    <style>
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            color: green;
+            font-size: 18px;
+        }
+
+        .back-button {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <form action="src/registration.php" method="post" id="registration-form" enctype="Multipart/form-data">
+            <h1>Регистрация</h1>
+            <div class="input-box">
+                <input type="text" placeholder="Ваше имя" required minlength="1" name="login">
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="text" placeholder="Придумайте логин" required minlength="1" name="login">
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="email" placeholder="Введите ваш Email" required name="login">
+                <i class='bx bx-envelope'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Придумайте пароль" required minlength="1" id="MyInput" name="password">
+                <i class="fa-regular fa-eye-slash Eyecon"></i>
+                
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Подтверждение пароля" required minlength="1" id="MyInput" name="password">
+                <i class="fa-regular fa-eye-slash Eyecon"></i>    
+            </div>
+            <button type="submit" class="btn">Зарегистрироваться
+                <a href="./lgpass.html"></a>
+            </button>
+                <div class="login-link">
+                <p>Уже есть аккаунт? <a href="./lgpass.php" target="_blank">Войти</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

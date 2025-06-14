@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рулетка Фортуны</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <style>
+        /* Fortune Wheel Styles */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px 0;
+        }
+        
+        .wheel-wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        
+        #wheel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            border: 5px solid var(--accent);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        #wheel-pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid var(--accent);
+            z-index: 10;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+        
+        .wheel-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 400px;
+            margin-top: 20px;
+        }
+        
+        .prize-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .prize-inputs input {
+            padding: 10px;
+            border: 2px solid var(--accent);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .wheel-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .wheel-buttons button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wheel-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .wheel-buttons button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .wheel-result {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            text-align: center;
+            background-color: var(--project-card-bg);
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            min-width: 300px;
+        }
+        
+        /* Confetti styles */
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            opacity: 0;
+            z-index: 1000;
+            animation: confetti-fall 3s ease-in-out;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-row">
+                <a href="./index.html" class="logo"><strong>Shopify</strong> Game</a>
+
+                <button class="dark-mode-btn">
+                    <img src="./img/icons/sun.svg" alt="Light mode" class="dark-mode-btn__icon">
+                    <img src="./img/icons/moon.svg" alt="Dark mode" class="dark-mode-btn__icon">
+                </button>
+
+                <ul class="nav-list">
+                    <li class="nav-list__item"><a href="./index.html" class="nav-list__link nav-list__link--active">Главная</a></li>
+                    <li class="nav-list__item"><a href="./logout/login-password/lgpass.html" class="nav-list__link">Войти</a></li>
+                    <li class="nav-list__item"><a href="./logout/login-password/register.html" class="nav-list__link">Регистрация</a></li>
+                    <li class="nav-list__item"><a href="./contacts.html" class="nav-list__link">Контакты</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="section">
+        <div class="container">
+            <div class="project-details">
+
+                <h1 class="title-1">Рулетка Фортуны</h1>
+
+                <!-- Fortune Wheel -->
+                <div class="wheel-container">
+                    <div class="wheel-wrapper">
+                        <div id="wheel-pointer"></div>
+                        <canvas id="wheel" width="400" height="400"></canvas>
+                    </div>
+                    
+                    <div class="wheel-controls">
+                        <div class="prize-inputs">
+                            <input type="text" id="prize1" placeholder="Приз 1 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize2" placeholder="Приз 2 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize3" placeholder="Приз 3 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize4" placeholder="Приз 4 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize5" placeholder="Приз 5 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize6" placeholder="Приз 6 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize7" placeholder="Приз 7 (оставьте пустым, чтобы скрыть)">
+                            <input type="text" id="prize8" placeholder="Приз 8 (оставьте пустым, чтобы скрыть)">
+                        </div>
+                        <div class="wheel-buttons">
+                            <button id="update-btn">Обновить рулетку</button>
+                            <button id="spin-btn">Крутить рулетку</button>
+                            <button id="reset-btn" disabled>Сбросить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="wheel-result" id="result">Введите призы и обновите рулетку</div>
+                </div>
+
+                <img src="./img/projects/02-big.jpg" alt="" class="project-details__cover">
+
+                <div class="project-details__desc">
+                    <p>Введите призы в поля выше (оставьте пустыми те, которые нужно скрыть) и нажмите "Обновить рулетку"</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__wrapper">
+                <ul class="social">
+                    <li class="social__item"><a href="#!"><img src="./img/icons/vk.svg" alt="Link"></a></li>
+                    <li class="social__item"><a href="#!"><img src="./img/icons/instagram.svg" alt="Link"></a></li>
+                    <li class="social__item"><a href="#!"><img src="./img/icons/twitter.svg" alt="Link"></a></li>
+                    <li class="social__item"><a href="#!"><img src="./img/icons/gitHub.svg" alt="Link"></a></li>
+                    <li class="social__item"><a href="#!"><img src="./img/icons/linkedIn.svg" alt="Link"></a></li>
+                </ul>
+                <div class="copyright">
+                    <p>© 2025 mgkeit.mskobr.ru</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wheelCanvas = document.getElementById('wheel');
+            const ctx = wheelCanvas.getContext('2d');
+            const spinBtn = document.getElementById('spin-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const updateBtn = document.getElementById('update-btn');
+            const resultElement = document.getElementById('result');
+            const prizeInputs = [
+                document.getElementById('prize1'),
+                document.getElementById('prize2'),
+                document.getElementById('prize3'),
+                document.getElementById('prize4'),
+                document.getElementById('prize5'),
+                document.getElementById('prize6'),
+                document.getElementById('prize7'),
+                document.getElementById('prize8')
+            ];
+            
+            const colors = ['#FF5252', '#FFEB3B', '#4CAF50', '#2196F3', 
+                          '#9C27B0', '#FF9800', '#795548', '#607D8B'];
+            let activePrizes = [];
+            let activeColors = [];
+            let isSpinning = false;
+            let currentRotation = 0;
+            let targetPrizeIndex = 0;
+            
+            // Initialize wheel
+            function initWheel() {
+                updateWheel();
+            }
+            
+            // Update wheel with only non-empty prizes
+            function updateWheel() {
+                // Filter out empty prizes
+                activePrizes = [];
+                activeColors = [];
+                
+                prizeInputs.forEach((input, index) => {
+                    if (input.value.trim() !== '') {
+                        activePrizes.push(input.value.trim());
+                        activeColors.push(colors[index]);
+                    }
+                });
+                
+                if (activePrizes.length < 2) {
+                    resultElement.textContent = "Добавьте как минимум 2 приза";
+                    spinBtn.disabled = true;
+                    return;
+                }
+                
+                spinBtn.disabled = false;
+                resultElement.textContent = "Готово к запуску! Введено призов: " + activePrizes.length;
+                drawWheel();
+            }
+            
+            // Draw wheel with active prizes only
+            function drawWheel() {
+                const centerX = wheelCanvas.width / 2;
+                const centerY = wheelCanvas.height / 2;
+                const radius = wheelCanvas.width / 2;
+                const segmentCount = activePrizes.length;
+                const arc = Math.PI * 2 / segmentCount;
+                
+                ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+                
+                // Draw segments only for active prizes
+                for (let i = 0; i < segmentCount; i++) {
+                    const angle = i * arc;
+                    ctx.beginPath();
+                    ctx.fillStyle = activeColors[i];
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
+                    ctx.lineTo(centerX, centerY);
+                    ctx.fill();
+                    ctx.strokeStyle = "#fff";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Draw text with larger font
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate(angle + arc / 2);
+                    ctx.textAlign = "right";
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "bold 18px Arial";
+                    
+                    // Adjust text position based on length
+                    const text = activePrizes[i];
+                    const maxLength = 12;
+                    const displayText = text.length > maxLength ? 
+                        text.substring(0, maxLength) + '...' : text;
+                    
+                    ctx.fillText(displayText, radius - 30, 8);
+                    ctx.restore();
+                }
+                
+                // Draw center circle
+                ctx.beginPath();
+                ctx.fillStyle = "#fff";
+                ctx.arc(centerX, centerY, 20, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+            
+            // Spin the wheel to specific prize
+            function spinToPrize(index) {
+                if (isSpinning || activePrizes.length < 2) return;
+                
+                isSpinning = true;
+                spinBtn.disabled = true;
+                updateBtn.disabled = true;
+                resetBtn.disabled = true;
+                resultElement.textContent = "Крутим...";
+                
+                // Calculate target rotation to land on the selected prize
+                const segmentCount = activePrizes.length;
+                const arc = Math.PI * 2 / segmentCount;
+                targetPrizeIndex = index;
+                
+                // Correct calculation for any number of segments
+                // Pointer is at top (12 o'clock position)
+                // We need the center of the selected segment to land at the pointer
+                const segmentCenterAngle = (index * arc) + (arc / 2);
+                // We need to rotate so that this angle points up (3π/2 radians)
+                const targetAngle = (3 * Math.PI / 2) - segmentCenterAngle;
+                
+                // Add multiple full rotations
+                const rotations = 5;
+                const targetRotation = currentRotation + (Math.PI * 2 * rotations) + targetAngle;
+                
+                const spinDuration = 4000;
+                const startTime = performance.now();
+                
+                function animate(time) {
+                    const elapsed = time - startTime;
+                    const progress = Math.min(elapsed / spinDuration, 1);
+                    const easeProgress = easeOutCubic(progress);
+                    
+                    currentRotation = easeProgress * (targetRotation - currentRotation) + currentRotation;
+                    wheelCanvas.style.transform = `rotate(${currentRotation}rad)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        finishSpin();
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Random spin
+            function spinWheel() {
+                if (activePrizes.length < 2) return;
+                const randomIndex = Math.floor(Math.random() * activePrizes.length);
+                spinToPrize(randomIndex);
+            }
+            
+            // Easing function for smooth stop
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+            
+            // Finish spin and show result
+            function finishSpin() {
+                isSpinning = false;
+                resetBtn.disabled = false;
+                updateBtn.disabled = false;
+                
+                const prize = activePrizes[targetPrizeIndex];
+                resultElement.textContent = `Поздравляем! Вы выиграли: ${prize}`;
+                createConfetti();
+            }
+            
+            // Reset wheel
+            function resetWheel() {
+                currentRotation = 0;
+                wheelCanvas.style.transform = 'rotate(0rad)';
+                drawWheel();
+                resultElement.textContent = "Готово к запуску! Введено призов: " + activePrizes.length;
+                spinBtn.disabled = activePrizes.length < 2;
+                resetBtn.disabled = true;
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                const colorPalette = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff', '#f80', '#08f'];
+                
+                for (let i = 0; i < 200; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.backgroundColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                    confetti.style.width = `${Math.random() * 10 + 5}px`;
+                    confetti.style.height = `${Math.random() * 10 + 5}px`;
+                    confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            }
+            
+            // Event listeners
+            spinBtn.addEventListener('click', spinWheel);
+            resetBtn.addEventListener('click', resetWheel);
+            updateBtn.addEventListener('click', updateWheel);
+            
+            // Initialize
+            initWheel();
+        });
+    </script>
+</body>
+</html>
